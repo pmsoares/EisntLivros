@@ -1,0 +1,25 @@
+﻿@if (TempData["success"] != null)
+{
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.2/dist/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
+    <script type="text/javascript">
+        toastr.options = {
+            "positionClass": "toast-top-center"
+        }
+        toastr.success('@TempData["success"]');
+    </script>
+}
+
+@if (TempData["error"] != null)
+{
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.6.2/dist/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
+    <script type="text/javascript">
+        toastr.options = {
+            "positionClass": "toast-top-center"
+        }
+        toastr.success('@TempData["error"]');
+    </script>
+}
