@@ -31,7 +31,7 @@ namespace EisntLivros.DataAccess.Repository
         {
             IQueryable<T> query = dbSet;
             query = query.Where(filter);
-            return query.FirstOrDefault();
+            return query.FirstOrDefault()!;
         }
 
         public void Remove(T entity)
