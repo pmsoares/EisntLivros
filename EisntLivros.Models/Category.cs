@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace EisntLivrosWeb.Models
+namespace EisntLivros.Models
 {
     public class Category
     {

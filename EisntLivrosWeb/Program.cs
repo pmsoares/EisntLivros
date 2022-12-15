@@ -1,4 +1,4 @@
-using EisntLivrosWeb.Data;
+using EisntLivros.DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

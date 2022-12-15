@@ -1,7 +1,7 @@
-﻿using EisntLivrosWeb.Models;
+﻿using EisntLivros.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace EisntLivrosWeb.Data
+namespace EisntLivros.DataAccess.Data
 {
     public class ApplicationDbContext : DbContext
     {

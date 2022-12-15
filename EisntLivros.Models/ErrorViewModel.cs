@@ -1,4 +1,4 @@
-namespace EisntLivrosWeb.Models
+namespace EisntLivros.Models
 {
     public class ErrorViewModel
     {

@@ -1,5 +1,5 @@
-﻿using EisntLivrosWeb.Data;
-using EisntLivrosWeb.Models;
+﻿using EisntLivros.DataAccess.Data;
+using EisntLivros.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EisntLivrosWeb.Controllers
@@ -49,14 +49,14 @@ namespace EisntLivrosWeb.Controllers
             if (id == null || id == 0)
                 return NotFound();
 
-            var categoryFromDb = _db.Categories.Find(id);
-            //var categoryFromDbFirst = _db.Categories.FirstOrDefault(category => category.Id == id);
+            //var categoryFromDb = _db.Categories.Find(id);
+            var categoryFromDbFirst = _db.Categories.FirstOrDefault(category => category.Name == "id");
             //var categoryFromDbSingle = _db.Categories.SingleOrDefault(category => category.Id == id);
 
-            if (categoryFromDb == null)
+            if (categoryFromDbFirst == null)
                 return NotFound();
 
-            return View(categoryFromDb);
+            return View(categoryFromDbFirst);
         }
 
         //POST
