@@ -2,8 +2,9 @@
 using EisntLivros.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace EisntLivrosWeb.Controllers
+namespace EisntLivrosWeb.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class CategoryController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
