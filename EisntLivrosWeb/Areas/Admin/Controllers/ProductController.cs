@@ -1,62 +1,60 @@
 ﻿using EisntLivros.DataAccess.Repository.IRepository;
 using EisntLivros.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace EisntLivrosWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class CoverTypeController : Controller
+    public class ProductController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public CoverTypeController(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
+        public ProductController(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
         public IActionResult Index()
         {
-            IEnumerable<CoverType> objCoverTypeList = _unitOfWork.CoverType.GetAll();
-            return View(objCoverTypeList);
+            IEnumerable<Product> objProductList = _unitOfWork.Product.GetAll();
+            return View(objProductList);
         }
 
         //GET
-        public IActionResult Create()
+        public IActionResult Upsert(int? id)
         {
-            return View();
-        }
+            Product product = new();
+            IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category.GetAll().Select(
+                u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                });
+            IEnumerable<SelectListItem> CoverTypeList = _unitOfWork.CoverType.GetAll().Select(
+                u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                });
 
-        //POST
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Create(CoverType obj)
-        {
-            if (ModelState.IsValid)
-            {
-                _unitOfWork.CoverType.Add(obj);
-                _unitOfWork.Save();
-                TempData["success"] = "Cover Type created successfully";
-                return RedirectToAction("Index");
-            }
-               
-            return View(obj);
-        }
-
-        //GET
-        public IActionResult Edit(int? id)
-        {
             if (id == null || id == 0)
-                return NotFound();
+            {
+                //Create Product
+                ViewBag.CategoryList = CategoryList;
+                ViewData["CoverTypeList"] = CoverTypeList;
+                return View(product);
 
-            CoverType? coverTypeFromDbFirst = _unitOfWork.CoverType.GetFirstOrDefault(u => u.Id == id);
+            }
+            else
+            {
+                //Update Product
+            }
 
-            if (coverTypeFromDbFirst == null)
-                return NotFound();
-
-            return View(coverTypeFromDbFirst);
+            return View(product);
         }
 
         //POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(CoverType obj)
+        public IActionResult Upsert(CoverType obj)
         {
             if (ModelState.IsValid)
             {
