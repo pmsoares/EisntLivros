@@ -1,5 +1,6 @@
 ﻿using EisntLivros.DataAccess.Repository.IRepository;
 using EisntLivros.Models;
+using EisntLivros.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -21,44 +22,43 @@ namespace EisntLivrosWeb.Areas.Admin.Controllers
         //GET
         public IActionResult Upsert(int? id)
         {
-            Product product = new();
-            IEnumerable<SelectListItem> CategoryList = _unitOfWork.Category.GetAll().Select(
-                u => new SelectListItem
+    
+            ProductVM productVM = new()
+            {
+                Product = new(),
+                CategoryList = _unitOfWork.Category.GetAll().Select(u=>new SelectListItem
                 {
                     Text = u.Name,
                     Value = u.Id.ToString()
-                });
-            IEnumerable<SelectListItem> CoverTypeList = _unitOfWork.CoverType.GetAll().Select(
-                u => new SelectListItem
+                }),
+                CoverTypeList = _unitOfWork.CoverType.GetAll().Select(u=>new SelectListItem
                 {
                     Text = u.Name,
                     Value = u.Id.ToString()
-                });
+                })
+            };
 
             if (id == null || id == 0)
             {
                 //Create Product
-                ViewBag.CategoryList = CategoryList;
-                ViewData["CoverTypeList"] = CoverTypeList;
-                return View(product);
-
+                return View(productVM);
             }
             else
             {
                 //Update Product
             }
 
-            return View(product);
+            return View(productVM);
         }
 
         //POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Upsert(CoverType obj)
+        public IActionResult Upsert(ProductVM obj, IFormFile file)
         {
             if (ModelState.IsValid)
             {
-                _unitOfWork.CoverType.Update(obj);
+                //_unitOfWork.CoverType.Update(obj);
                 _unitOfWork.Save();
                 TempData["success"] = "Cover Type updated successfully";
                 return RedirectToAction("Index");
