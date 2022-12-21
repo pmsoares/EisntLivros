@@ -85,7 +85,7 @@ namespace EisntLivrosWeb.Areas.Admin.Controllers
             if (id == null || id == 0)
                 return NotFound();
 
-            var categoryFromDbFirst = _unitOfWork.Category.GetFirstOrDefault(u => u.Id == id);
+            Category? categoryFromDbFirst = _unitOfWork.Category.GetFirstOrDefault(u => u.Id == id);
 
             if (categoryFromDbFirst == null)
                 return NotFound();
@@ -98,7 +98,7 @@ namespace EisntLivrosWeb.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeletePOST(int? id)
         {
-            var obj = _unitOfWork.Category.GetFirstOrDefault(u => u.Id == id);
+            Category? obj = _unitOfWork.Category.GetFirstOrDefault(u => u.Id == id);
             if (obj == null) return NotFound();
 
             _unitOfWork.Category.Remove(obj);
