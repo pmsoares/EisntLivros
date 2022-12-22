@@ -20,6 +20,6 @@
 
 <div>
     <form method="post" asp-area="Customer" asp-controller="Home" asp-action="CultureManagement" asp-route-returnUrl="@returnUrl">
-        <select name="culture" asp-for="@culture!.RequestCulture.UICulture.Name" asp-items="cultureList" onchange="this.form.submit();"></select>
+        <select class="form-select" name="culture" asp-for="@culture!.RequestCulture.UICulture.Name" asp-items="cultureList" onchange="this.form.submit();"></select>
     </form>
 </div>

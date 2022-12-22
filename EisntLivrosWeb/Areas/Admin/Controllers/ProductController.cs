@@ -1,5 +1,4 @@
-﻿using AspNetCore;
-using EisntLivros.DataAccess.Repository.IRepository;
+﻿using EisntLivros.DataAccess.Repository.IRepository;
 using EisntLivros.Models;
 using EisntLivros.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -43,16 +42,11 @@ namespace EisntLivrosWeb.Areas.Admin.Controllers
                 })
             };
 
-            if (id == null || id == 0)
-            {
-                //Create Product
-                return View(productVM);
-            }
-            else
-            {
-                //Update Product
-            }
+            //Update product
+            if (id != null && id != 0)
+                productVM.Product = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == id);
 
+            //Update or create
             return View(productVM);
         }
 
@@ -70,6 +64,13 @@ namespace EisntLivrosWeb.Areas.Admin.Controllers
                     string uploads = Path.Combine(wwwRootPath, @"images\products");
                     string extension = Path.GetExtension(file.FileName);
 
+                    if (obj.Product.ImageURL != null)
+                    {
+                        string oldImagePath = Path.Combine(wwwRootPath, obj.Product.ImageURL.TrimStart('\\'));
+                        if (System.IO.File.Exists(oldImagePath))
+                            System.IO.File.Delete(oldImagePath);
+                    }
+
                     using (FileStream fileStreams = new(Path.Combine(uploads, fileName + extension), FileMode.Create))
                     {
                         file.CopyTo(fileStreams);
@@ -78,9 +79,18 @@ namespace EisntLivrosWeb.Areas.Admin.Controllers
                     obj.Product.ImageURL = @"\images\products\" + fileName + extension;
                 }
 
-                _unitOfWork.Product.Add(obj.Product);
+                if (obj.Product.Id == 0)
+                {
+                    _unitOfWork.Product.Add(obj.Product);
+                    TempData["success"] = "Product created successfully";
+                }
+                else
+                {
+                    _unitOfWork.Product.Update(obj.Product);
+                    TempData["success"] = "Product updated successfully";
+                }
+
                 _unitOfWork.Save();
-                TempData["success"] = "Product created successfully";
                 return RedirectToAction("Index");
             }
 
@@ -120,7 +130,7 @@ namespace EisntLivrosWeb.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var productList = _unitOfWork.Product.GetAll();
+            var productList = _unitOfWork.Product.GetAll(includeProperties: "Category,CoverType");
             return Json(new { data = productList });
         }
         #endregion
