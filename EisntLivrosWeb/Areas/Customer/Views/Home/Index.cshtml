@@ -1,11 +1,37 @@
 ﻿@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
-
+@model IEnumerable<Product>
 @{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">@localizer["HelloWorld"]</h1>
-    <h1 class="display-4">@ViewData["test"]</h1>
-    <p>@localizer["Sentence"]</p>
+<div class="row pb-3">
+    @foreach (Product product in Model)
+    {
+        <div class="col-lg-3 col-md-6">
+            <div class="row p-2">
+                <div class="col-12 p-1" style="border:1px solid #008cba; border-radius: 5px;">
+                    <div class="card">
+                        <img src="@product.ImageURL" class="card-img-top rounded" alt="Image" />
+                        <div class="card-body">
+                            <div class="pl-1">
+                                <p class="card-title h5 text-primary">@product.Title</p>
+                                <p class="card-title text-info">by @product.Author</p>
+                            </div>
+                            <div class="pl-1">
+                                <p>List Price: <strike><strong>@product.ListPrice.ToString("C")</strong></strike></p>
+                            </div>
+                            <div class="pl-1">
+                                <p>As low as: <strong>@product.Price100.ToString("C")</strong></p>
+                            </div>
+                        </div>
+                        <div>
+                            <a asp-action="Details" class="btn btn-primary form-control" asp-route-id="@product.Id">
+                                Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>

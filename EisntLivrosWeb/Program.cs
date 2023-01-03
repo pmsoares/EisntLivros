@@ -17,10 +17,10 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     {
         List<CultureInfo> supportedCultures = new()
         {
-            new CultureInfo("en"),
-            new CultureInfo("pt"),
-            new CultureInfo("fr"),
-            new CultureInfo("es")
+            new CultureInfo("en-US"),
+            new CultureInfo("pt-PT"),
+            new CultureInfo("fr-FR"),
+            new CultureInfo("es-ES")
         };
 
         options.DefaultRequestCulture = new RequestCulture(supportedCultures[0]);
@@ -37,11 +37,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlSer
     ));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
-
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -49,7 +47,6 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-
 
 app.UseHttpsRedirection();
 

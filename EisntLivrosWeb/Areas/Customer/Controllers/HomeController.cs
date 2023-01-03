@@ -1,4 +1,5 @@
-﻿using EisntLivros.Models;
+﻿using EisntLivros.DataAccess.Repository.IRepository;
+using EisntLivros.Models;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Localization;
@@ -11,17 +12,29 @@ namespace EisntLivrosWeb.Areas.Customer.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IHtmlLocalizer<HomeController> _localizer;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public HomeController(ILogger<HomeController> logger, IHtmlLocalizer<HomeController> localizer)
+        public HomeController(ILogger<HomeController> logger, IHtmlLocalizer<HomeController> localizer, IUnitOfWork unitOfWork)
         {
             _logger = logger;
             _localizer = localizer;
+            _unitOfWork = unitOfWork;
         }
 
         public IActionResult Index()
         {
-            ViewData["test"] = _localizer["test"];
-            return View();
+            IEnumerable<Product> productList = _unitOfWork.Product.GetAll(includeProperties: "Category,CoverType");
+            return View(productList);
+        }
+
+        public IActionResult Details(int id)
+        {
+            ShoppingCart cartObj = new()
+            {
+                Count = 1,
+                Product = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == id, includeProperties: "Category,CoverType")
+            };
+            return View(cartObj);
         }
 
         [HttpPost]
