@@ -1,10 +1,11 @@
 ﻿using EisntLivros.DataAccess.Repository.IRepository;
 using EisntLivros.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EisntLivrosWeb.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin")]    
     public class CategoryController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
