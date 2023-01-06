@@ -4,9 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EisntLivros.DataAccess.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options) { }
 
         public DbSet<Category> Categories { get; set; }
 
@@ -18,6 +19,6 @@ namespace EisntLivros.DataAccess.Data
 
         public DbSet<Company> Companies { get; set; }
 
-        public DbSet<ShoppingCart> ShoppingCarts { get; set;}
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
     }
 }
