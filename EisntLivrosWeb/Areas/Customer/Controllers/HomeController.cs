@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Localization;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace EisntLivrosWeb.Areas.Customer.Controllers
 {
@@ -33,12 +34,29 @@ namespace EisntLivrosWeb.Areas.Customer.Controllers
             ShoppingCart cartObj = new()
             {
                 Count = 1,
+                ProductId = id,
                 Product = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == id, includeProperties: "Category,CoverType")
             };
             return View(cartObj);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public IActionResult Details(ShoppingCart shoppingCart)
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity!;
+            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+            shoppingCart.ApplicationUserId = claim!.Value;
+
+            _unitOfWork.ShoppingCart.Add(shoppingCart);
+            _unitOfWork.Save();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult CultureManagement(string culture, string returnUrl)
         {
             Response.Cookies.Append(
