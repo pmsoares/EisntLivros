@@ -29,13 +29,13 @@ namespace EisntLivrosWeb.Areas.Customer.Controllers
             return View(productList);
         }
 
-        public IActionResult Details(int id)
+        public IActionResult Details(int productId)
         {
             ShoppingCart cartObj = new()
             {
                 Count = 1,
-                ProductId = id,
-                Product = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == id, includeProperties: "Category,CoverType")
+                ProductId = productId,
+                Product = _unitOfWork.Product.GetFirstOrDefault(u => u.Id == productId, includeProperties: "Category,CoverType")
             };
             return View(cartObj);
         }
@@ -49,7 +49,14 @@ namespace EisntLivrosWeb.Areas.Customer.Controllers
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
             shoppingCart.ApplicationUserId = claim!.Value;
 
-            _unitOfWork.ShoppingCart.Add(shoppingCart);
+            ShoppingCart cartFromDb = _unitOfWork.ShoppingCart.GetFirstOrDefault(
+                _ => _.ApplicationUserId == claim.Value && _.ProductId == shoppingCart.ProductId);
+
+            if (cartFromDb == null)
+                _unitOfWork.ShoppingCart.Add(shoppingCart);
+            else
+                _unitOfWork.ShoppingCart.IncrementCount(cartFromDb, shoppingCart.Count);
+
             _unitOfWork.Save();
 
             return RedirectToAction(nameof(Index));

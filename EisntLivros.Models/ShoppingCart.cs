@@ -23,5 +23,8 @@ namespace EisntLivros.Models
         [ForeignKey("ApplicationUserId")]
         [ValidateNever]
         public ApplicationUser ApplicationUser { get; set; } = null!;
+
+        [NotMapped]
+        public double Price { get; set; }
     }
 }

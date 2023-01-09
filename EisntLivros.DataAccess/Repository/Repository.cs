@@ -13,7 +13,7 @@ namespace EisntLivros.DataAccess.Repository
         public Repository(ApplicationDbContext db)
         {
             _db = db;
-            //_db.Products.Include(u=> u.Category).Include(u=>u.CoverType);
+            //_db.ShoppingCarts.Include(u=> u.Product);
             this.dbSet = _db.Set<T>();
         }
 
@@ -23,9 +23,13 @@ namespace EisntLivros.DataAccess.Repository
         }
 
         //includeProperties - "Category,CoverType"
-        public IEnumerable<T> GetAll(string? includeProperties = null)
+        public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
         {
             IQueryable<T> query = dbSet;
+
+            if (filter != null)
+                query = query.Where(filter);
+
             if (includeProperties != null)
                 foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                     query = query.Include(includeProp);
