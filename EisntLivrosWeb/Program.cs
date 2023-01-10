@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Stripe;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +39,9 @@ builder.Services.AddMvc()
 // DB Context
 string connectionString = builder.Configuration.GetConnectionString("LocalDB") ?? throw new InvalidOperationException("Connection string 'LocalDB' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+
+// Stripe
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
 
 // Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
@@ -71,6 +75,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
 
 app.UseAuthorization();
 
