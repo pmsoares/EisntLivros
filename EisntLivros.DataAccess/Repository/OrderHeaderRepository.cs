@@ -29,5 +29,16 @@ namespace EisntLivros.DataAccess.Repository
                     orderFromDb.PaymentStatus = paymentStatus;
             }
         }
+
+        public void UpdateStripePaymentId(int id, string sessionId, string paymentIntentId)
+        {
+            var orderFromDb = _db.OrderHeaders.FirstOrDefault(_ => _.Id == id);
+
+            if (orderFromDb != null)
+            {
+                orderFromDb.SessionId = sessionId;
+                orderFromDb.PaymentIntentId = paymentIntentId;
+            }
+        }
     }
 }

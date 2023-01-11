@@ -1,4 +1,6 @@
 ﻿@model EisntLivros.Models.ViewModels.ShoppingCartVM
+@using Microsoft.Extensions.Options
+@inject IOptions<EisntLivros.Utility.StripeSettings> Stripe
 
 <form method="post">
     <br />
@@ -106,7 +108,8 @@
             <div class="card-footer">
                 <div class="row">
                     <div class="col-12 col-md-8 pt-2">
-                        <p style="color:maroon; font-size:14px;">Estimate Arrival Date: 
+                        <p style="color:maroon; font-size:14px;">
+                            Estimate Arrival Date:
                             @DateTime.Now.AddDays(7).ToShortDateString() - @DateTime.Now.AddDays(14).ToShortDateString()
                         </p>
                     </div>
@@ -118,3 +121,7 @@
         </div>
     </div>
 </form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}
