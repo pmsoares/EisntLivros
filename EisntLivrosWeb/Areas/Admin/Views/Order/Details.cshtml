@@ -1,17 +1,19 @@
 ﻿@model EisntLivros.Models.ViewModels.OrderVM
-
 @using EisntLivros.Utility
 
 <form method="post">
+    <input asp-for="OrderHeader.Id" hidden />
     <br />
     <div class="container">
         <div class="card">
-            <div class="card-header bg-dark text-light ml-0 row container">
-                <div class="col-12 d-none d-md-block col-md-6 pb-1">
-                    <i class="fas fa-shopping-cart"></i> &nbsp; Order Summary
-                </div>
-                <div class="col-12 col-md-4 offset-md-2 text-right">
-                    <a asp-action="Index" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
+            <div class="card-header bg-dark text-light ml-0">
+                <div class="container row">
+                    <div class="col-12 d-none d-md-block col-md-6 pb-1">
+                        <i class="fas fa-shopping-cart"></i> &nbsp; Order Summary
+                    </div>
+                    <div class="col-12 col-md-4 offset-md-2 text-right">
+                        <a asp-action="Index" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
+                    </div>
                 </div>
             </div>
             <div class="card-body">
@@ -192,47 +194,68 @@
                                     <input asp-for="OrderHeader.PaymentStatus" type="text" readonly class="form-control" />
                                 </div>
                             </div>
-                            <input type="submit" class="btn btn-warning form-control my-1" value="Update Order Details" />
 
+                            @if (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee))
+                            {
+                                <input type="submit" asp-action="UpdateOrderDetail" class="btn btn-warning form-control my-1" value="Update Order Details" />
+                            }
 
                         </div>
                         <div class="col-12 col-lg-5 offset-lg-1">
                             <h4 class="d-flex justify-content-between align-items-center mb-3">
                                 <span class="text-primary">Order Summary</span>
                             </h4>
-                            <label class="btn btn-outline-primary form-control my-2">Order Status - OrderStatus</label>
+                            <label class="btn btn-outline-primary form-control my-2">Order Status - @Model.OrderHeader.OrderStatus</label>
 
                             <ul class="list-group mb-3">
-                                <li class="list-group-item d-flex justify-content-between p-2">
-                                    <div class="row container">
-                                        <div class="col-8">
-
-                                            <h6 class="my-0 text-primary">Product.Title</h6>
-                                            <small class="text-muted">Price : Price</small><br />
-                                            <small class="text-muted">Quantity : Count</small>
+                                @foreach (var detail in Model.OrderDetails)
+                                {
+                                    <li class="list-group-item d-flex justify-content-between p-2">
+                                        <div class="row container">
+                                            <div class="col-8">
+                                                <h6 class="my-0 text-primary">@detail.Product.Title</h6>
+                                                <small class="text-muted">Price : @detail.Price.ToString("C")</small><br />
+                                                <small class="text-muted">Quantity : @detail.Count</small>
+                                            </div>
+                                            <div class="col-4 text-end">
+                                                <p class="text-success">@((detail.Count * detail.Price).ToString("C"))</p>
+                                            </div>
                                         </div>
-                                        <div class="col-4">
-                                            <p class="text-success">count * price</p>
-                                        </div>
-                                    </div>
-                                </li>
-
+                                    </li>
+                                }
                                 <li class="list-group-item bg-info">
                                     <div class="row container">
                                         <div class="col-6">
                                             <h5 class="text-white">TOTAL </h5>
                                         </div>
-                                        <div class="col-6 text-right">
-                                            <h5 class="text-white">$$$</h5>
+                                        <div class="col-6 text-end">
+                                            <h5 class="text-white">@Model.OrderHeader.OrderTotal.ToString("C")</h5>
                                         </div>
                                     </div>
                                 </li>
                             </ul>
 
-                            <input type="submit" class="btn btn-primary form-control my-1" value="Start Processing" />
-                            <input type="submit" class="btn btn-primary form-control my-1" value="Ship Order" />
-                            <input type="submit" class="btn btn-success form-control my-1" value="Pay Now" />
-                            <input type="submit" class="btn btn-danger form-control my-1" value="Cancel Order" />
+                            @if (Model.OrderHeader.PaymentStatus == SD.PaymentStatusDelayedPayment && Model.OrderHeader.OrderStatus == SD.StatusShipped)
+                            {
+                                <input type="submit" class="btn btn-success form-control my-1" value="Pay Now" />
+                            }
+
+                            @if (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee))
+                            {
+                                if (Model.OrderHeader.OrderStatus == SD.StatusApproved)
+                                {
+                                    <input type="submit" asp-action="StartProcessing" class="btn btn-primary form-control my-1" value="Start Processing" />
+                                }
+                                if (Model.OrderHeader.OrderStatus == SD.StatusInProcess)
+                                {
+                                    <input type="submit" asp-action="ShipOrder" onclick="return ValidateInput()" class="btn btn-primary form-control my-1" value="Ship Order" />
+                                }
+                                if (Model.OrderHeader.OrderStatus != SD.StatusRefunded && Model.OrderHeader.OrderStatus != SD.StatusCancelled &&
+                                Model.OrderHeader.OrderStatus != SD.StatusShipped)
+                                {
+                                    <input type="submit" asp-action="CancelOrder" class="btn btn-danger form-control my-1" value="Cancel Order" />
+                                }
+                            }
                         </div>
                     </div>
                 </div>
@@ -241,3 +264,28 @@
     </div>
 </form>
 
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function ValidateInput() {
+            if (document.getElementById("carrier").value == "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Please enter carrier!',
+                });
+                return false;
+            }
+            if (document.getElementById("trackingNumber").value == "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Please enter tracking number!',
+                });
+                return false;
+            }
+            return true;
+        }
+    </script>
+}

@@ -14,6 +14,7 @@ namespace EisntLivros.DataAccess.Repository
         {
             _db = db;
             //_db.ShoppingCarts.Include(u=> u.Product);
+            //_db.ShoppingCarts.AsNoTracking()
             this.dbSet = _db.Set<T>();
         }
 
@@ -37,9 +38,15 @@ namespace EisntLivros.DataAccess.Repository
             return query.ToList();
         }
 
-        public T GetFirstOrDefault(Expression<Func<T, bool>> filter, string? includeProperties = null)
+        public T GetFirstOrDefault(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = true)
         {
-            IQueryable<T> query = dbSet;
+            IQueryable<T> query;
+
+            if (tracked)
+                query = dbSet;
+            else
+                query = dbSet.AsNoTracking();
+
             query = query.Where(filter);
             if (includeProperties != null)
                 foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))

@@ -16,7 +16,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.2" />
-    <PackageReference Include="Stripe.net" Version="41.5.0-beta.1" />
+    <PackageReference Include="Stripe.net" Version="41.5.0-beta.2" />
   </ItemGroup>
 
   <ItemGroup>
