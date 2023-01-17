@@ -1,9 +1,63 @@
-﻿<div class="container p-3 mb-4">
-    <div class="row pt-4">
-        <div class="col-6">
+﻿@{
+    var status = Context.Request.Query["status"];
+    string pending = "text-primary";
+    string inprocess = "text-primary";
+    string completed = "text-primary";
+    string approved = "text-primary";
+    string all = "text-primary";
+
+    switch (status)
+    {
+        case "pending":
+            pending = "active text-white";
+            break;
+
+        case "inprocess":
+            inprocess = "active text-white";
+            break;
+
+        case "completed":
+            completed = "active text-white";
+            break;
+
+        case "approved":
+            approved = "active text-white";
+            break;
+
+        default:
+            all = "active text-white";
+            break;
+    }
+}
+
+
+<div class="p-3">
+    <div class="d-flex justify-content-between pt-4">
+        <div class="p-2">
             <h2 class="text-primary">Order List</h2>
         </div>
-        <div class="col-6 text-end">
+        <div class="p-2">
+            <ul class="list-group list-group-horizontal-sm">
+                <a class="text-decoration-none" asp-controller="Order" asp-action="Index" asp-route-status="inprocess">
+                <li class="list-group-item @inprocess">In Process</li>
+                </a>
+
+                <a class="text-decoration-none" asp-controller="Order" asp-action="Index" asp-route-status="pending">
+                <li class="list-group-item @pending">Payment Pending</li>
+                </a>
+
+                <a class="text-decoration-none" asp-controller="Order" asp-action="Index" asp-route-status="completed">
+                <li class="list-group-item @completed">Completed</li>
+                </a>
+
+                <a class="text-decoration-none" asp-controller="Order" asp-action="Index" asp-route-status="approved">
+                <li class="list-group-item @approved">Approved</li>
+                </a>
+
+                <a class="text-decoration-none" asp-controller="Order" asp-action="Index" asp-route-status="all">
+                <li class="list-group-item @all">All</li>
+                </a>
+            </ul>
         </div>
     </div>
 

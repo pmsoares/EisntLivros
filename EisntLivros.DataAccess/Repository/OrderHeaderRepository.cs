@@ -36,6 +36,7 @@ namespace EisntLivros.DataAccess.Repository
 
             if (orderFromDb != null)
             {
+                orderFromDb.PaymentDate = DateTime.Now;
                 orderFromDb.SessionId = sessionId;
                 orderFromDb.PaymentIntentId = paymentIntentId;
             }
