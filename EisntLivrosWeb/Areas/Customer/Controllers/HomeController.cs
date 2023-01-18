@@ -1,5 +1,6 @@
 ﻿using EisntLivros.DataAccess.Repository.IRepository;
 using EisntLivros.Models;
+using EisntLivros.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,8 +50,7 @@ namespace EisntLivrosWeb.Areas.Customer.Controllers
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
             shoppingCart.ApplicationUserId = claim!.Value;
 
-            ShoppingCart cartFromDb = _unitOfWork.ShoppingCart.GetFirstOrDefault(
-                _ => _.ApplicationUserId == claim.Value && _.ProductId == shoppingCart.ProductId);
+            ShoppingCart cartFromDb = _unitOfWork.ShoppingCart.GetFirstOrDefault(_ => _.ApplicationUserId == claim.Value && _.ProductId == shoppingCart.ProductId);
 
             if (cartFromDb == null)
                 _unitOfWork.ShoppingCart.Add(shoppingCart);
@@ -58,6 +58,7 @@ namespace EisntLivrosWeb.Areas.Customer.Controllers
                 _unitOfWork.ShoppingCart.IncrementCount(cartFromDb, shoppingCart.Count);
 
             _unitOfWork.Save();
+            HttpContext.Session.SetInt32(SD.SessionCart, _unitOfWork.ShoppingCart.GetAll(_ => _.ApplicationUserId == claim.Value).ToList().Count);
 
             return RedirectToAction(nameof(Index));
         }

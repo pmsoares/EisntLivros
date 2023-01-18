@@ -3,6 +3,7 @@ using EisntLivros.Models;
 using EisntLivros.Models.ViewModels;
 using EisntLivros.Utility;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Stripe.Checkout;
 using System.Security.Claims;
@@ -14,13 +15,16 @@ namespace EisntLivrosWeb.Areas.Customer.Controllers
     public class CartController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IEmailSender _emailSender;
+
         [BindProperty]
         public ShoppingCartVM ShoppingCartVM { get; set; } = null!;
         public int OrderTotal { get; set; }
 
-        public CartController(IUnitOfWork unitOfWork)
+        public CartController(IUnitOfWork unitOfWork, IEmailSender emailSender)
         {
             _unitOfWork = unitOfWork;
+            _emailSender = emailSender;
         }
 
         public IActionResult Index()
@@ -188,7 +192,7 @@ namespace EisntLivrosWeb.Areas.Customer.Controllers
 
         public IActionResult OrderConfirmation(int id)
         {
-            OrderHeader orderHeader = _unitOfWork.OrderHeader.GetFirstOrDefault(_ => _.Id == id);
+            OrderHeader orderHeader = _unitOfWork.OrderHeader.GetFirstOrDefault(_ => _.Id == id, includeProperties: "ApplicationUser");
 
             if (orderHeader.PaymentStatus != SD.PaymentStatusDelayedPayment)
             {
@@ -202,9 +206,13 @@ namespace EisntLivrosWeb.Areas.Customer.Controllers
                 }
             }
 
+            _emailSender.SendEmailAsync(orderHeader.ApplicationUser.Email!, "New Order - Eisnt Livros", "<p>New Order Created</p>");
+
             List<ShoppingCart> shoppingCarts = _unitOfWork.ShoppingCart.GetAll(_ => _.ApplicationUserId == orderHeader.ApplicationUserId).ToList();
             _unitOfWork.ShoppingCart.RemoveRange(shoppingCarts);
             _unitOfWork.Save();
+
+            HttpContext.Session.Clear();
 
             return View(id);
         }
@@ -222,7 +230,11 @@ namespace EisntLivrosWeb.Areas.Customer.Controllers
             var cart = _unitOfWork.ShoppingCart.GetFirstOrDefault(_ => _.Id == cartId);
 
             if (cart.Count <= 1)
+            {
                 _unitOfWork.ShoppingCart.Remove(cart);
+                var count = _unitOfWork.ShoppingCart.GetAll(_ => _.ApplicationUserId == cart.ApplicationUserId).ToList().Count - 1;
+                HttpContext.Session.SetInt32(SD.SessionCart, count);
+            }
             else
                 _unitOfWork.ShoppingCart.DecrementCount(cart, 1);
 
@@ -235,6 +247,10 @@ namespace EisntLivrosWeb.Areas.Customer.Controllers
             var cart = _unitOfWork.ShoppingCart.GetFirstOrDefault(_ => _.Id == cartId);
             _unitOfWork.ShoppingCart.Remove(cart);
             _unitOfWork.Save();
+
+            var count = _unitOfWork.ShoppingCart.GetAll(_ => _.ApplicationUserId == cart.ApplicationUserId).ToList().Count;
+            HttpContext.Session.SetInt32(SD.SessionCart, count);
+
             return RedirectToAction(nameof(Index));
         }
 
