@@ -1,4 +1,5 @@
 using EisntLivros.DataAccess.Data;
+using EisntLivros.DataAccess.DbInitializer;
 using EisntLivros.DataAccess.Repository;
 using EisntLivros.DataAccess.Repository.IRepository;
 using EisntLivros.Models;
@@ -54,7 +55,15 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 builder.Services.AddSingleton<IEmailSender, EmailSender>();
+
+// Facebook Login
+builder.Services.AddAuthentication().AddFacebook(options =>
+{
+    options.AppId = "ID";
+    options.AppSecret = "SECRET";
+});
 
 // Application Cookies
 builder.Services.ConfigureApplicationCookie(options =>
@@ -91,6 +100,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
+SeedDatabase();
 
 app.UseAuthorization();
 
@@ -105,3 +115,13 @@ app.MapControllerRoute(
 app.MapRazorPages();
 
 app.Run();
+
+
+void SeedDatabase()
+{
+    using(var scope = app.Services.CreateScope())
+    {
+        var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+        dbInitializer.Initialize();
+    }
+}

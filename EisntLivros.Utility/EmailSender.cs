@@ -18,28 +18,30 @@ namespace EisntLivros.Utility
 
         public Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            //MimeMessage emailToSend = new();
-            //emailToSend.From.Add(MailboxAddress.Parse("noreply@pedrosoares.com"));
-            //emailToSend.To.Add(MailboxAddress.Parse(email));
-            //emailToSend.Subject = subject;
-            //emailToSend.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = htmlMessage };
+            //SEND BY GMAIL SMTP
+            MimeMessage emailToSend = new();
+            emailToSend.From.Add(MailboxAddress.Parse("admin@site.com"));
+            emailToSend.To.Add(MailboxAddress.Parse(email));
+            emailToSend.Subject = subject;
+            emailToSend.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = htmlMessage };
 
-            ////Send Email
-            //using (SmtpClient emailClient = new())
-            //{
-            //    emailClient.Connect("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
-            //    emailClient.Authenticate("pmsoares@gmail.com", "aoiqpguqbimrukvp");
-            //    emailClient.Send(emailToSend);
-            //    emailClient.Disconnect(true);
-            //}
-            //return Task.CompletedTask;
+            using (SmtpClient emailClient = new())
+            {
+                emailClient.Connect("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+                emailClient.Authenticate("admin@site.com", "PASSWORD");
+                emailClient.Send(emailToSend);
+                emailClient.Disconnect(true);
+            }
+            return Task.CompletedTask;
 
-            SendGridClient client = new(SendGridSecret);
-            EmailAddress from = new("pedro.soares@cherrycovilha.pt", "Eisnt Livros");
-            EmailAddress to = new(email);
-            var msg = MailHelper.CreateSingleEmail(from, to, subject, "", htmlMessage);
 
-            return client.SendEmailAsync(msg);
+            //SEND BY SENDGRID
+            //SendGridClient client = new(SendGridSecret);
+            //EmailAddress from = new("admin@site.com", "Eisnt Livros");
+            //EmailAddress to = new(email);
+            //var msg = MailHelper.CreateSingleEmail(from, to, subject, "", htmlMessage);
+
+            //return client.SendEmailAsync(msg);
         }
     }
 }

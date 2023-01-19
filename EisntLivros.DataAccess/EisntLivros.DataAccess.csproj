@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EisntLivros.Models\EisntLivros.Models.csproj" />
+    <ProjectReference Include="..\EisntLivros.Utility\EisntLivros.Utility.csproj" />
   </ItemGroup>
 
 </Project>
